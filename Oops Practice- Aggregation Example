@@ -1,0 +1,35 @@
+## Vehicle Class
+class Vehicle:
+  def __init__(self, color, licenese_plate, is_electric):
+    self.color = color
+    self.license_plate = licenese_plate
+    self.is_electric = is_electric
+
+  def show_license_plate(self):
+    print(self.license_plate)
+
+  def show_info(self):
+    print("My Vehichle:")
+    print(f"Color: {self.color}")
+    print(f"License Plate: {self.license_plate}")
+    print(f"Electric: {self.is_electric}")
+
+## Employee Class
+class Employee:
+  def __init__(self, name, vehicle):
+    self.name = name
+    self.vehicle = vehicle
+
+  def show_vehicle_info(self):
+    self.vehicle.show_info()
+
+
+vehicle = Vehicle("black", "AXY 245", is_electric=False)
+employee = Employee("Gino", vehicle)
+
+print(employee)
+print(employee.name)
+print(employee.vehicle)
+
+employee.show_vehicle_info()
+print(employee.vehicle.color, employee.vehicle.license_plate, employee.vehicle.is_electric)
