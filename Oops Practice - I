@@ -1,0 +1,178 @@
+## 1st Method
+
+
+class CashRegister:
+    def __init__(self):
+        self.purchase = {}
+
+    def add_product(self, product, quantity=1):
+        name = product["name"]
+        price = product["price"]
+
+        if name in self.purchase:
+            self.purchase[name].quantity += quantity
+        else:
+            self.purchase[name] = {"price": price, "quantity": quantity}
+
+    def show_product_list(self):
+        self.product_list = []
+        for name, product in self.purchase.items():
+            # print(name,"\t" ,product,"\n")
+            self.product_list.append(name)
+        return self.product_list
+
+    def remove_product(self, product_name):
+        if product_name in self.purchase:
+            del self.purchase[product_name]
+            print(f"prodcut_name: {product_name}, is deleted from purchase")
+        else:
+            print(f"prodcut_name: {product_name}, is not found in the purchase")
+
+    def update_product(self, product_name, new_price):
+        if product_name in self.purchase:
+            self.purchase[product_name]["price"] = new_price
+            print(f"New Price update for product_name {product_name}")
+        else:
+            print(f"prodcut_name: {product_name}, is not found in the purchase")
+
+    def subtotal_purchase(self):
+        self.subtotal = 0
+        for name, product in self.purchase.items():
+            self.subtotal  += product['price'] * product["quantity"]
+        return self.subtotal
+
+    def total_tax(self):
+        return self.subtotal*0.05
+
+    def total_amount(self):
+        return self.subtotal + self.total_tax()
+
+    def clear_purchase(self):
+        self.purchase.clear()
+        print("Purchase cleared. Ready for a new transaction.")
+
+
+pizza = {"name": "Pizza", "price": 10.34}
+soda = {"name": "Soda", "price": 2.50}
+burger = {"name": "Burger", "price": 5.75}
+
+register = CashRegister()
+
+register.add_product(pizza, 2)
+register.add_product(soda, 5)
+register.add_product(burger, 5)
+
+print(f"Puchase dictionry: {register.purchase}\n")
+
+print(f"Product list is: {register.show_product_list()}\n")
+
+register.remove_product("pepsi")
+print(f"After removing product: {register.purchase}\n")
+
+register.remove_product("Soda")
+print(f"After removing product: {register.purchase}\n")
+
+register.update_product("Soda", 5.0)
+print(f"After updating product: {register.purchase}\n")
+
+register.update_product("Burger", 6.75)
+print(f"After updating product: {register.purchase}\n")
+
+print(f"Subtotal Amount: {register.subtotal_purchase()}\n")
+print(f"Total tax applied amount: {register.total_tax()}\n")
+print(f"Total amount: {register.total_amount()}\n")
+
+register.clear_purchase()
+print(f"Puchase dictionry: {register.purchase}\n")
+
+
+
+
+########################################################
+########################################################
+
+
+## 2nd Method
+
+class CashRegister:
+    TAX_DECIMAL = 0.05
+    def __init__(self):
+        self.purchase = {}
+
+    def add_product(self, product, quantity=1):
+        name = product["name"]
+        price = product["price"]
+
+        if name in self.purchase:
+            self.purchase[name].quantity += quantity
+        else:
+            self.purchase[name] = {"price": price, "quantity": quantity}
+
+    def show_product_list(self):
+        return [name for name in self.purchase]
+
+    def remove_product(self, product_name):
+        if product_name in self.purchase:
+            del self.purchase[product_name]
+            print(f"prodcut_name: {product_name}, is deleted from purchase")
+        else:
+            print(f"prodcut_name: {product_name}, is not found in the purchase")
+
+    def update_product(self, product_name, new_price):
+        if product_name in self.purchase:
+            self.purchase[product_name]["price"] = new_price
+            print(f"New Price update for product_name {product_name}")
+        else:
+            print(f"prodcut_name: {product_name}, is not found in the purchase")
+
+    def subtotal_purchase(self):
+        return sum(details["price"] * details["quantity"] for details in self.purchase.values())
+
+    def total_tax(self):
+        return self.subtotal_purchase()*CashRegister.TAX_DECIMAL
+
+    def total_amount(self):
+        return self.subtotal_purchase() + self.total_tax()
+
+    def clear_purchase(self):
+        self.purchase.clear()
+        print("Purchase cleared. Ready for a new transaction.")
+
+
+# ---------------- DEMO ----------------
+if __name__ == "__main__":
+    # Create products
+    pizza = {"name": "Pizza", "price": 10.34}
+    soda = {"name": "Soda", "price": 2.50}
+    burger = {"name": "Burger", "price": 5.75}
+
+    # Create a cash register
+    register = CashRegister()
+
+    # Add products
+    register.add_product(pizza, 2)   # 2 Pizzas
+    register.add_product(soda)       # 1 Soda (default)
+    register.add_product(burger, 3)  # 3 Burgers
+
+    print(f"Puchase dictionry: {register.purchase}\n")
+
+    print(f"Product list is: {register.show_product_list()}\n")
+
+    register.remove_product("pepsi")
+    print(f"After removing product: {register.purchase}\n")
+
+    register.remove_product("Soda")
+    print(f"After removing product: {register.purchase}\n")
+
+    register.update_product("Soda", 5.0)
+    print(f"After updating product: {register.purchase}\n")
+
+    register.update_product("Burger", 6.75)
+    print(f"After updating product: {register.purchase}\n")
+
+    print(f"Subtotal Amount: {register.subtotal_purchase()}\n")
+    print(f"Total tax applied amount: {register.total_tax()}\n")
+    print(f"Total amount: {register.total_amount()}\n")
+
+    register.clear_purchase()
+    print(f"Puchase dictionry: {register.purchase}\n")
