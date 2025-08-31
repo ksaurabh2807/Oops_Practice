@@ -24,8 +24,8 @@ class Employee:
     self.vehicle.show_info()
 
 
-vehicle = Vehicle("black", "AXY 245", is_electric=False)
-employee = Employee("Gino", vehicle)
+my_vehicle = Vehicle("black", "AXY 245", is_electric=False)
+employee = Employee("Gino", my_vehicle)
 
 print(employee)
 print(employee.name)
