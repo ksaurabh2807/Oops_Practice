@@ -1,0 +1,144 @@
+import random
+ 
+class Dice:
+  def __init__(self):
+    self._value = None  # default value should be none  there could be another way to define none value in init only like init__(self, value=None)
+
+  @property      ## getter value not setter as we dont want to change value outside class
+  def value(self):
+    return self._value
+
+  def roll(self):
+    new_value = random.randint(1, 6)
+    self._value = new_value
+    return new_value
+
+
+class Player:
+  def __init__(self, dice, is_computer=False):
+    self._dice = dice
+    self._is_computer = is_computer
+    self._counter = 10  ## by default counter is 10 , These attributes should be non public if you dont know what to chose by default chose to non public
+
+  @property
+  def dice(self):
+    return self._dice
+
+  @property
+  def is_computer(self):
+    return self._is_computer
+
+  @property
+  def counter(self):
+    return self._counter
+
+  def decrement_counter(self):
+    self._counter -= 1
+    return self._counter 
+
+  def increment_counter(self):
+    self._counter += 1
+    return self._counter 
+
+  def roll_dice(self):
+    return self._dice.roll()
+
+
+
+class DiceGame:
+  def __init__(self, player, computer):
+    self._player = player
+    self._computer = computer
+
+  def play(self):
+    print("==============================")
+    print(" Welcome to Roll the Dice!")
+    print("==============================")
+    ## its like a infinite rule untill the value is condition is satisfied
+    while True:                                
+      self.play_round()
+      # TODO: implement game over
+      game_over = self.check_game_over()
+      if game_over:
+        break
+
+  def play_round(self):
+    # Welcome the user
+    self.print_round_welcome()
+
+    player_value = self._player.roll_dice()
+    computer_value = self._computer.roll_dice()
+
+    # Show the value
+    self.show_dice(player_value, computer_value)
+
+    # Determine winner and loser
+    if player_value > computer_value:
+      print("\nYou won the round\n")
+      self.update_counters(winner=self._player, loser=self._computer)
+    elif computer_value > player_value:
+      print("\nComputer won the round\n")
+      self.update_counters(winner=self._computer, loser=self._player)
+    else:
+      print("\nIt is a tie!\n")
+
+    # Show Ccounters
+    self.show_counters()
+
+  def print_round_welcome(self):
+    print("\n---------New Round---------")
+    input("Press any key to roll the dice.")
+
+  def show_dice(self, player_value, computer_value):
+    print(f"\nYour dice: {player_value}")
+    print(f"Computer dice: {computer_value}")
+
+  def update_counters(self, winner, loser):
+    winner.decrement_counter()
+    loser.increment_counter()
+
+  def show_counters(self):
+    print(f"Your counter: {self._player.counter}")
+    print(f"Computer counter: {self._computer.counter}")
+
+  def check_game_over(self):
+    if self._player.counter == 0:
+      # pass # TODO: game over. The Player  won.
+      self.show_game_over(self._player)
+      return True
+    elif self._computer.counter == 0:
+      # pass # TODO game over. The computer won.
+      self.show_game_over(self._computer)
+      return True
+    else:
+      return False
+
+  def show_game_over(self, winner):
+    if winner.is_computer:
+      print("\n=======================")
+      print("G A M E   O V E R")
+      print("========================")
+      print("The Computer win the game. Sorry...")
+      print("=========================")
+    else:
+      print("\n=======================")
+      print("G A M E   O V E R")
+      print("========================")
+      print("You won the game@ Congraturlations")
+      print("=========================")
+
+
+
+# Testing the dice game instance
+
+if __name__=="__main__":
+  player_die = Dice()
+  computer_die = Dice()
+
+  my_player = Player(player_die, is_computer=False)
+  computer_player = Player(computer_die, is_computer=True)
+
+  game = DiceGame(my_player, computer_player)
+
+  # Start the Game
+  game.play()
