@@ -24,8 +24,8 @@ class Employee:
     self.vehicle.show_info()
 
 
-my_vehicle = Vehicle("black", "AXY 245", is_electric=False)
-employee = Employee("Gino", my_vehicle)
+employee_vehicle = Vehicle("black", "AXY 245", is_electric=False)
+employee = Employee("Gino", employee_vehicle)
 
 print(employee)
 print(employee.name)
@@ -33,3 +33,5 @@ print(employee.vehicle)
 
 employee.show_vehicle_info()
 print(employee.vehicle.color, employee.vehicle.license_plate, employee.vehicle.is_electric)
+
+# print(employee.employee_vehicle.color) # This will give error
