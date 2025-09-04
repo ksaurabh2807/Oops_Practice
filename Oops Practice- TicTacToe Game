@@ -1,0 +1,324 @@
+# Tic-Tac-Toe Board
+#        col1 col2 col3
+# row 0: | 1 | 2 | 3 |
+# row 1: | 4 | 5 | 6 |### Game: Tic-Tac-Toe
+
+#### Requirement-
+There will be three classes
+- Move - value
+- Player - computer/human, and it value from move and their marker
+- Board - Board position & it values after each turn, how to get/submit the move and check winning condition
+Finally we add all three to tic-tac-toe game
+
+
+#### Game Rules:-
+- Tow playes tyry to fill a row, a column, the diagonal or the antidiagonal of a 3x3 board.
+- The user will enter an integer from 1 to 0 to select the position of the board.
+- On each turn, the player will slect a particular position on the board and a marker will be added to that position
+- If the player selectedx a position that is already taken, he/she loses the turn.
+- When a row, a column, a diagonal or anti-diagonal is full withe player's markers, the game is over and tha player wins the game.
+- If the board is full buit none of the player has won the game, than there is tie.
+- When the game is over, we will ask the user if he/she would like to continue playing, We will take user input and start a new round if the player chooses continue the game.
+# row 2: | 7 | 8 | 9 |
+
+
+class Move:
+
+  def __init__(self, value):
+    self._value = value
+
+  @property
+  def value(self):
+    return self._value
+
+  def is_valid(self):
+    return 1<=self._value<=9
+
+  def get_row(self):
+    if self._value in (1, 2, 3):
+      return 0          # First row
+    elif self._value in (4, 5, 6):
+      return 1          # Second row
+    else:
+      return 2          # Third row
+
+  def get_column(self):
+    if self._value in (1, 4, 7):
+      return 0          # First column
+    elif self._value in (2, 5, 8):
+      return 1          # Second column
+    else:
+      return 2          # Third column
+
+
+
+# if __name__=="__main__":
+#   test_move = Move(8)
+#   print(test_move.value)
+#   print(test_move.is_valid())
+#   print(test_move.get_row())
+#   print(test_move.get_column())
+
+#   another_move = Move(10)
+#   print(another_move.is_valid())
+
+
+
+import random
+
+class Player:
+
+  PLAYER_MARKER = "X"
+  COMPUTER_MARKER = "O"
+
+  def __init__(self, is_human=True):
+    self._is_human = is_human
+
+    if is_human:
+      self._marker = Player.PLAYER_MARKER
+    else:
+      self._marker = Player.COMPUTER_MARKER
+
+  @property
+  def player(self):
+    return self._is_human
+
+  @property
+  def marker(self):
+    return self._marker
+
+  def get_move(self):
+    if self._is_human:
+      return self.get_human_move()
+    else:
+      return self.get_computer_move()
+
+  def get_human_move(self):
+    while True:
+      user_input = int(input("Please enter your move (1-9): "))
+      move = Move(user_input)
+      if move.is_valid():
+        break
+      else:
+        print("Please enter an integer between 1 and 9.")
+    return move
+
+  def get_computer_move(self):
+    random_choice = random.choice(list(range(1,10)))
+    move = Move(random_choice)
+    print(f"Computer move (1-9): {move.value}")
+    return move
+
+
+# if __name__=="__main__":
+#   my_player = Player()  # Not passed any thing i.e, by default it is human player
+#   print(my_player.player)
+#   print(my_player.marker)
+#   my_player.get_move()
+
+#   computer_player = Player(False)
+#   print(computer_player.player)
+#   print(computer_player.marker)
+#   computer_player.get_move()
+
+
+
+class Board:
+
+  EMPTY_CELL = 0
+
+  def __init__(self):
+    self.game_board = [[0, 0 , 0], [0, 0, 0], [0, 0, 0]]
+
+  def print_board(self):
+    print("\nPositions")
+    self.print_board_with_positions()
+
+    print("Board")
+    for row in self.game_board:
+      print("|", end = "")
+      for column in row:
+        # if the column is empty print blank space
+        if column == Board.EMPTY_CELL:
+          print("   |", end="")  # Three spaces for empty cell
+        else:
+          print(f" {column} |", end="")  # One space on each side of marker
+      print()
+    print()
+
+  def print_board_with_positions(self):
+    print("| 1 | 2 | 3 |\n| 4 | 5 | 6 |\n| 7 | 8 | 9 |")
+
+  def submit_move(self, player, move):
+    row = move.get_row()
+    col = move.get_column()
+    value = self.game_board[row][col]
+
+    if value == Board.EMPTY_CELL:
+      self.game_board[row][col] = player.marker
+    else:
+      print("This position is already taken. Please enter another one")
+
+  def check_is_game_over(self, player, last_move):
+    return((self.check_row(player, last_move))
+            or (self.check_column(player, last_move))
+            or (self.check_diagonal(player))
+            or (self.check_antidiagonal(player)))
+
+  def check_row(self, player, last_move):
+    row_index = last_move.get_row()
+    board_row = self.game_board[row_index] # [ 0, 0, "X"]
+
+    return board_row.count(player.marker) == 3
+
+  def check_column(self, player, last_move):
+    markers_count = 0
+    col_index = last_move.get_column()
+
+    for i in range(3):
+      if self.game_board[i][col_index] == player.marker:
+        markers_count += 1
+
+    return markers_count == 3
+
+  def check_diagonal(self, player):
+    markers_count = 0
+
+    for i in range(3): # 0, 1, 2
+      if self.game_board[i][i] == player.marker:
+        markers_count += 1
+
+    return markers_count == 3
+
+  def check_antidiagonal(self, player):
+    markers_count = 0
+
+    for i in range(3):
+      if self.game_board[i][2-i] == player.marker:
+        markers_count += 1
+
+    return markers_count == 3
+
+  def check_is_tie(self):
+    empty_counter = 0
+
+    for row in self.game_board:
+      empty_counter += row.count(Board.EMPTY_CELL)
+
+    return empty_counter == 0
+
+  def reset_board(self):
+    self.game_board = [[0, 0 , 0], [0, 0, 0], [0, 0, 0]]
+
+
+### Test 1 for Board Class
+# board = Board()
+# player = Player()
+# move = Move(5)
+# board.print_board()
+# board.submit_move(player, move)
+# board.print_board()
+
+
+### Test 1 for Board Class
+# board = Board()
+# player = Player()
+
+# board.print_board()
+
+# move1 = player.get_move()
+# move2 = player.get_move()
+# move3 = player.get_move()
+
+# board.submit_move(player, move1)
+# board.submit_move(player, move2)
+# board.submit_move(player, move3)
+
+# print(board.check_is_game_over(player, move3))
+
+# board.print_board()
+
+
+### Test 1 for Board Class
+# board = Board()
+# player = Player()
+# computer = Player(is_human=False)
+
+# board.print_board()
+
+# while not board.check_is_tie():
+#   human_move = player.get_move()
+#   board.submit_move(player, human_move)
+
+#   board.print_board()
+
+#   computer_move = computer.get_move()
+#   board.submit_move(computer, computer_move)
+
+#   board.print_board()
+
+# print("It is a tie!")
+
+
+
+
+
+class TicTacToeGame:
+
+  def start(self):
+    print("************************")
+    print(" Welcome to Tic-Tac-Toe ")
+    print("************************")
+
+    board = Board()
+    player = Player()
+    computer = Player(is_human=False)
+
+    board.print_board()
+
+    # Ask the user if he/she would like to play another round
+    while True:
+      # board.print_board()
+      while True:
+        player_move = player.get_move()
+        board.submit_move(player, player_move)
+        board.print_board()
+
+        if board.check_is_tie():
+          print("It is a tie! Try Again.")
+          break
+        elif board.check_is_game_over(player, player_move):
+          print("Awesome. You won the game!")
+          break
+        else:
+          computer_move = computer.get_move()
+          board.submit_move(computer, computer_move)
+          board.print_board()
+
+          if board.check_is_game_over(computer, computer_move):
+            print("Oops... The computer won. Try Again")
+            break
+
+      play_again = input("Would you like to play again? Enter X for Yes or O for No").upper()
+      if play_again == "O":
+        print("Bye! Come back soon.")
+        break
+      elif play_again == "X":
+        self.start_new_round(board)
+      else:
+        print("Your input was not valid I will assume that you want to play again.")
+        self.start_new_round(board)
+
+  def start_new_round(self, board):
+    print("***********")
+    print(" New Round ")
+    print("***********")
+    board.reset_board()
+    board.print_board()
+
+
+
+
+if __name__=="__main__":
+  game = TicTacToeGame()
+  game.start()
