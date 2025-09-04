@@ -1,0 +1,135 @@
+# Task- To develop and app to keep track of student's to-dos and university course
+
+# - Description provided by client
+#   Student will be able to create a to-do and assign a description, due date, and priority
+#   To-dos can be classified as: Presonal, Academic, Work, or Leisure
+#   The three psossible priorities for a to-do are Urgent Immediate and optional
+#   To-dos should be removed from the list when the student marks them as complete
+#   The app should also inclued a list of university courses and that the student is taking
+#   Each course should have a code, a professor, a start time, end time and the classrrom assigned
+#   Optionally, the student can assign a classroom and a course to do if it is related to academeic activities
+
+
+# - Task is to:
+#   Analyze the relevant classesfor the app and the attributes and methods of each class
+#   List the relevant attributes(and, if possible, the potential values) and write a bried description of the functionality of the methods
+
+
+from datetime import date
+from pprint import pprint
+
+# -------- ToDo Class --------
+class ToDo:
+    CATEGORY = ['Personal', 'Academic', 'Work', 'Leisure']
+    PRIORITY = ['Urgent', 'Immediate', 'Optional']
+
+    def __init__(self, description: str, due_date: date, priority: str, category: str, is_complete: bool = False):
+        if priority not in ToDo.PRIORITY:
+            raise ValueError(f"Invalid priority. Choose from {ToDo.PRIORITY}")
+        if category not in ToDo.CATEGORY:
+            raise ValueError(f"Invalid category. Choose from {ToDo.CATEGORY}")
+        self._description = description
+        self._due_date = due_date
+        self._priority = priority
+        self._category = category
+        self._is_complete = is_complete
+
+    def to_dict(self):
+        return {
+            "description": self._description,
+            "due_date": self._due_date,
+            "priority": self._priority,
+            "category": self._category,
+            "is_complete": self._is_complete
+        }
+
+# -------- Student Class --------
+class Student:
+    def __init__(self):
+        self._students = {}
+
+    def add_student(self, name: str, todo: ToDo):
+        if name in self._students:
+            self._students[name].append(todo.to_dict())
+        else:
+            self._students[name] = [todo.to_dict()]
+
+    def get_student_dict(self):
+        return self._students
+
+# -------- University Class --------
+class University:
+    def __init__(self):
+        self._universities = {}
+
+    def add_course(self, university_name: str, course_name: str, student: Student):
+        if university_name not in self._universities:
+            self._universities[university_name] = {}
+
+        if course_name not in self._universities[university_name]:
+            self._universities[university_name][course_name] = {}
+
+        student_data = student.get_student_dict()
+
+        for name, todos in student_data.items():
+            if name in self._universities[university_name][course_name]:
+                self._universities[university_name][course_name][name].extend(todos)
+            else:
+                self._universities[university_name][course_name][name] = todos
+
+    def get_university_data(self):
+        return self._universities
+
+    def remove_completed_todos(self, university_name: str, course_name: str, student_name: str):
+        try:
+            todos = self._universities[university_name][course_name][student_name]
+            filtered = [todo for todo in todos if not todo.get("is_complete", False)]
+            self._universities[university_name][course_name][student_name] = filtered
+        except KeyError:
+            print(f"Could not find path: {university_name} -> {course_name} -> {student_name}")
+
+    def remove_all_completed_todos(self):
+        for uni_name, courses in self._universities.items():
+            for course_name, students in courses.items():
+                for student_name, todos in students.items():
+                    filtered = [todo for todo in todos if not todo.get("is_complete", False)]
+                    self._universities[uni_name][course_name][student_name] = filtered
+
+# -------- Main Execution --------
+if __name__ == "__main__":
+    # Create ToDos
+    todo1 = ToDo("Finish assignment", date(2025, 9, 5), "Urgent", "Academic")
+    todo2 = ToDo("Project meeting", date(2025, 9, 6), "Optional", "Work")
+    todo3 = ToDo("Finish assignment", date(2025, 9, 7), "Immediate", "Academic")
+    todo4 = ToDo("Call parents", date(2025, 9, 7), "Optional", "Personal", is_complete=True)  # ✅ Completed
+
+    # Create Students
+    student1 = Student()
+    student2 = Student()
+
+    student1.add_student("Alice", todo1)
+    student1.add_student("Alice", todo4)  # ✅ Completed
+    student2.add_student("Bob", todo2)
+    student2.add_student("Bob", todo3)
+
+    # Create University Manager
+    uni = University()
+
+    # Add Courses to University
+    uni.add_course("Harvard", "Math", student1)
+    uni.add_course("Harvard", "Math", student2)
+    uni.add_course("Harvard", "Physics", student1)
+    uni.add_course("Harvard", "Physics", student2)
+
+    # ✅ Before Cleanup
+    print("\n📘 University Data (Before Cleanup):")
+    print(uni.get_university_data())
+
+    # ✅ Remove all completed todos
+    uni.remove_all_completed_todos()
+
+    # ✅ After Cleanup
+    print("\n🧹 University Data (After Cleanup):")
+    print(uni.get_university_data())
+
+
